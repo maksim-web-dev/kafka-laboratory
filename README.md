@@ -73,12 +73,12 @@ curl -s -X POST http://localhost:8081/api/orders \
 Відповідь:
 ```json
 {
-  "orderId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "userId": "user-42",
-  "product": "Kafka: The Definitive Guide",
-  "quantity": 2,
-  "totalAmount": 59.99,
-  "timestamp": "2026-06-10T12:00:00"
+   "orderId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+   "userId": "user-42",
+   "product": "Kafka: The Definitive Guide",
+   "quantity": 2,
+   "totalAmount": 59.99,
+   "timestamp": "2026-06-10T12:00:00"
 }
 ```
 
@@ -137,7 +137,7 @@ curl http://localhost:8082/api/notifications/count
 
 ### Consumer (notification-service)
 
-1. `@KafkaListener(topics = "orders.created", groupId = "notification-service-group")` підписується на топік при старті.
+1. `@KafkaListener(topics = ["orders.created"], groupId = "notification-service-group")` підписується на топік при старті.
 2. `auto-offset-reset: earliest` — якщо consumer group нова або offset не знайдено, читає з початку.
 3. Метод отримує `ConsumerRecord<String, OrderCreatedEvent>` — включає metadata (partition, offset) і сам event.
 4. `JsonDeserializer` з `spring.json.value.default.type` десеріалізує JSON у локальний `OrderCreatedEvent` клас.
@@ -171,7 +171,7 @@ Apache Kafka 3.3+ підтримує **KRaft** (Kafka Raft) — вбудован
 | **Message Key** | `orderId` як ключ повідомлення |
 | **Offset** | Порядковий номер повідомлення в партиції |
 | **KRaft mode** | Kafka без Zookeeper |
-| **JsonSerializer** | Серіалізація Java-об'єктів у JSON |
+| **JsonSerializer** | Серіалізація Kotlin data class у JSON |
 
 ---
 
@@ -182,23 +182,25 @@ kafka-laboratory/
 ├── docker-compose.yml
 ├── order-service/
 │   ├── Dockerfile
-│   ├── pom.xml
-│   └── src/main/java/com/kafkalab/order/
-│       ├── OrderServiceApplication.java
-│       ├── config/KafkaTopicConfig.java      ← створення топіку
-│       ├── controller/OrderController.java   ← POST /api/orders
+│   ├── build.gradle.kts
+│   ├── settings.gradle.kts
+│   └── src/main/kotlin/com/kafkalab/order/
+│       ├── OrderServiceApplication.kt
+│       ├── config/KafkaTopicConfig.kt      ← створення топіку
+│       ├── controller/OrderController.kt   ← POST /api/orders
 │       ├── model/
-│       │   ├── CreateOrderRequest.java
-│       │   └── OrderCreatedEvent.java
-│       └── service/OrderService.java         ← KafkaTemplate.send()
+│       │   ├── CreateOrderRequest.kt
+│       │   └── OrderCreatedEvent.kt
+│       └── service/OrderService.kt         ← KafkaTemplate.send()
 └── notification-service/
     ├── Dockerfile
-    ├── pom.xml
-    └── src/main/java/com/kafkalab/notification/
-        ├── NotificationServiceApplication.java
-        ├── controller/NotificationController.java  ← GET /api/notifications/count
-        ├── listener/OrderEventListener.java        ← @KafkaListener
-        └── model/OrderCreatedEvent.java
+    ├── build.gradle.kts
+    ├── settings.gradle.kts
+    └── src/main/kotlin/com/kafkalab/notification/
+        ├── NotificationServiceApplication.kt
+        ├── controller/NotificationController.kt  ← GET /api/notifications/count
+        ├── listener/OrderEventListener.kt        ← @KafkaListener
+        └── model/OrderCreatedEvent.kt
 ```
 
 ---
