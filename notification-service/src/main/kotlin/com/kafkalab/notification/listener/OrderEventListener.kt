@@ -1,5 +1,6 @@
 package com.kafkalab.notification.listener
 
+import com.kafkalab.notification.model.OrderCancelledEvent
 import com.kafkalab.notification.model.OrderCreatedEvent
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
@@ -11,24 +12,44 @@ import java.util.concurrent.atomic.AtomicInteger
 class OrderEventListener {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val receivedCount = AtomicInteger(0)
+    private val createdCount   = AtomicInteger(0)
+    private val cancelledCount = AtomicInteger(0)
 
+    // orders.created має 3 партиції — один consumer читає всі три
     @KafkaListener(topics = ["orders.created"], groupId = "notification-service-group")
     fun handleOrderCreated(record: ConsumerRecord<String, OrderCreatedEvent>) {
         val event = record.value()
-        val count = receivedCount.incrementAndGet()
+        val count = createdCount.incrementAndGet()
 
-        log.info("──────────────────────────────────────")
-        log.info(" NOTIFICATION #{}", count)
-        log.info(" Partition: {}  |  Offset: {}", record.partition(), record.offset())
-        log.info(" Order ID  : {}", event.orderId)
-        log.info(" User ID   : {}", event.userId)
-        log.info(" Product   : {} x{}", event.product, event.quantity)
-        log.info(" Total     : \${}", event.totalAmount)
-        log.info(" Sent at   : {}", event.timestamp)
-        log.info(" → Email sent to user {}", event.userId)
-        log.info("──────────────────────────────────────")
+        log.info("╔══════════════════════════════════════╗")
+        log.info("║  ORDER CREATED  #{}", count)
+        log.info("║  Topic: {}  Partition: {}  Offset: {}",
+            record.topic(), record.partition(), record.offset())
+        log.info("║  Order ID  : {}", event.orderId)
+        log.info("║  User ID   : {}", event.userId)
+        log.info("║  Product   : {} x{}", event.product, event.quantity)
+        log.info("║  Total     : \${}", event.totalAmount)
+        log.info("║  → Email sent to user {}", event.userId)
+        log.info("╚══════════════════════════════════════╝")
     }
 
-    fun getReceivedCount(): Int = receivedCount.get()
+    // orders.cancelled має 1 партицію — всі скасування строго в порядку
+    @KafkaListener(topics = ["orders.cancelled"], groupId = "notification-service-group")
+    fun handleOrderCancelled(record: ConsumerRecord<String, OrderCancelledEvent>) {
+        val event = record.value()
+        val count = cancelledCount.incrementAndGet()
+
+        log.info("╔══════════════════════════════════════╗")
+        log.info("║  ORDER CANCELLED  #{}", count)
+        log.info("║  Topic: {}  Partition: {}  Offset: {}",
+            record.topic(), record.partition(), record.offset())
+        log.info("║  Order ID  : {}", event.orderId)
+        log.info("║  User ID   : {}", event.userId)
+        log.info("║  Reason    : {}", event.reason)
+        log.info("║  → Cancellation email sent to user {}", event.userId)
+        log.info("╚══════════════════════════════════════╝")
+    }
+
+    fun getCreatedCount(): Int   = createdCount.get()
+    fun getCancelledCount(): Int = cancelledCount.get()
 }

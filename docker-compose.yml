@@ -1,8 +1,13 @@
 services:
 
+  # branch02: container_name = *-b02, external ports shifted (+2 або +3)
+  # щоб можна було запустити branch01 і branch02 одночасно
+  # branch01 ports: kafka=9092, kafka-ui=8080, order=8081, notification=8082
+  # branch02 ports: kafka=9094, kafka-ui=8083, order=8091, notification=8092
+
   kafka:
     image: confluentinc/cp-kafka:8.0.1
-    container_name: kafka
+    container_name: kafka-b02
     environment:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
@@ -16,9 +21,9 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      - CLUSTER_ID=5M7h4oTiU-fNDtL--Y97tx
     ports:
-      - "9092:9092"
+      - "9094:9092"
     healthcheck:
       test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
       interval: 10s
@@ -28,11 +33,11 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+    container_name: kafka-ui-b02
     ports:
-      - "8080:8080"
+      - "8083:8080"
     environment:
-      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_NAME=branch02
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
       kafka:
@@ -40,9 +45,9 @@ services:
 
   order-service:
     build: ./order-service
-    container_name: order-service
+    container_name: order-service-b02
     ports:
-      - "8081:8081"
+      - "8091:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -51,9 +56,9 @@ services:
 
   notification-service:
     build: ./notification-service
-    container_name: notification-service
+    container_name: notification-service-b02
     ports:
-      - "8082:8082"
+      - "8092:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
