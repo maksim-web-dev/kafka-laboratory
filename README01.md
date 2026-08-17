@@ -8,7 +8,7 @@
 POST /api/orders
       │
       ▼
-┌─────────────────┐        topic: orders.created        ┌──────────────────────────┐
+┌─────────────────┐      topic: 01.orders.created        ┌──────────────────────────┐
 │  order-service  │  ──────────────────────────────────▶ │  notification-service    │
 │  :8081          │         (JSON message)               │  :8082                   │
 └─────────────────┘                                      └──────────────────────────┘
@@ -41,7 +41,7 @@ POST /api/orders
 ## Як запустити
 
 ```bash
-docker compose up --build
+docker compose -f docker-compose-01.yml up --build
 ```
 
 Перший запуск завантажує образи та компілює сервіси (5–7 хвилин).
@@ -49,7 +49,7 @@ docker compose up --build
 
 Перевірити готовність:
 ```bash
-docker compose ps
+docker compose -f docker-compose-01.yml ps
 # всі 4 сервіси мають бути у стані "healthy" або "running"
 ```
 
@@ -85,7 +85,7 @@ curl -s -X POST http://localhost:8081/api/orders \
 ### 2. Перевірити логи notification-service
 
 ```bash
-docker logs notification-service --tail=20
+docker logs b01-notification-service --tail=20
 ```
 
 Очікуваний вивід:
@@ -113,7 +113,7 @@ curl http://localhost:8082/api/notifications/count
 
 Відкрити у браузері: [http://localhost:8080](http://localhost:8080)
 
-- Topics → `orders.created` → Messages — видно JSON кожного повідомлення
+- Topics → `01.orders.created` → Messages — видно JSON кожного повідомлення
 - Consumers → `notification-service-group` — видно offset і lag
 
 ---
@@ -124,7 +124,7 @@ curl http://localhost:8082/api/notifications/count
 
 1. `OrderController` отримує POST-запит і передає дані в `OrderService`.
 2. `OrderService` створює `OrderCreatedEvent` з унікальним `orderId` (UUID) та поточним timestamp.
-3. `KafkaTemplate.send(topic, key, value)` серіалізує event у JSON і надсилає в топік `orders.created`.
+3. `KafkaTemplate.send(topic, key, value)` серіалізує event у JSON і надсилає в топік `01.orders.created`.
    - **Key**: `orderId` — поки що не впливає на routing (1 партиція), але готує нас до branch03.
    - **Value**: JSON без type headers (`spring.json.add.type.headers=false`).
 4. `CompletableFuture` callback логує partition і offset після підтвердження від брокера.
@@ -132,12 +132,12 @@ curl http://localhost:8082/api/notifications/count
 ### Kafka (брокер)
 
 - Працює в **KRaft mode**: замість Zookeeper використовує власний Raft-консенсус (`PROCESS_ROLES=broker,controller`).
-- Топік `orders.created` створюється автоматично через Spring `NewTopic` bean при старті order-service.
+- Топік `01.orders.created` створюється автоматично через Spring `NewTopic` bean при старті order-service.
 - 1 партиція, replication factor 1 (single-broker setup для dev).
 
 ### Consumer (notification-service)
 
-1. `@KafkaListener(topics = ["orders.created"], groupId = "notification-service-group")` підписується на топік при старті.
+1. `@KafkaListener(topics = ["01.orders.created"], groupId = "notification-service-group")` підписується на топік при старті.
 2. `auto-offset-reset: earliest` — якщо consumer group нова або offset не знайдено, читає з початку.
 3. Метод отримує `ConsumerRecord<String, OrderCreatedEvent>` — включає metadata (partition, offset) і сам event.
 4. `JsonDeserializer` з `spring.json.value.default.type` десеріалізує JSON у локальний `OrderCreatedEvent` клас.
@@ -164,7 +164,7 @@ Apache Kafka 3.3+ підтримує **KRaft** (Kafka Raft) — вбудован
 
 | Концепція | Що демонструє приклад |
 |-----------|----------------------|
-| **Topic** | `orders.created` — канал для подій одного типу |
+| **Topic** | `01.orders.created` — канал для подій одного типу |
 | **Producer** | `KafkaTemplate.send()` — публікація повідомлення |
 | **Consumer** | `@KafkaListener` — підписка на топік |
 | **Consumer Group** | `notification-service-group` — логічна група читачів |
@@ -179,28 +179,30 @@ Apache Kafka 3.3+ підтримує **KRaft** (Kafka Raft) — вбудован
 
 ```
 kafka-laboratory/
-├── docker-compose.yml
-├── order-service/
-│   ├── Dockerfile
-│   ├── build.gradle.kts
-│   ├── settings.gradle.kts
-│   └── src/main/kotlin/com/kafkalab/order/
-│       ├── OrderServiceApplication.kt
-│       ├── config/KafkaTopicConfig.kt      ← створення топіку
-│       ├── controller/OrderController.kt   ← POST /api/orders
-│       ├── model/
-│       │   ├── CreateOrderRequest.kt
-│       │   └── OrderCreatedEvent.kt
-│       └── service/OrderService.kt         ← KafkaTemplate.send()
-└── notification-service/
-    ├── Dockerfile
-    ├── build.gradle.kts
-    ├── settings.gradle.kts
-    └── src/main/kotlin/com/kafkalab/notification/
-        ├── NotificationServiceApplication.kt
-        ├── controller/NotificationController.kt  ← GET /api/notifications/count
-        ├── listener/OrderEventListener.kt        ← @KafkaListener
-        └── model/OrderCreatedEvent.kt
+├── docker-compose-01.yml
+├── README01.md
+└── branch01_basic/
+    ├── order-service/
+    │   ├── Dockerfile
+    │   ├── build.gradle.kts
+    │   ├── settings.gradle.kts
+    │   └── src/main/kotlin/com/kafkalab/order/
+    │       ├── OrderServiceApplication.kt
+    │       ├── config/KafkaTopicConfig.kt      ← створення топіку
+    │       ├── controller/OrderController.kt   ← POST /api/orders
+    │       ├── model/
+    │       │   ├── CreateOrderRequest.kt
+    │       │   └── OrderCreatedEvent.kt
+    │       └── service/OrderService.kt         ← KafkaTemplate.send()
+    └── notification-service/
+        ├── Dockerfile
+        ├── build.gradle.kts
+        ├── settings.gradle.kts
+        └── src/main/kotlin/com/kafkalab/notification/
+            ├── NotificationServiceApplication.kt
+            ├── controller/NotificationController.kt  ← GET /api/notifications/count
+            ├── listener/OrderEventListener.kt        ← @KafkaListener
+            └── model/OrderCreatedEvent.kt
 ```
 
 ---

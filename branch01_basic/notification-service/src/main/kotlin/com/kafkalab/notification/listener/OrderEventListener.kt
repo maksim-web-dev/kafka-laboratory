@@ -13,7 +13,7 @@ class OrderEventListener {
     private val log = LoggerFactory.getLogger(javaClass)
     private val receivedCount = AtomicInteger(0)
 
-    @KafkaListener(topics = ["orders.created"], groupId = "notification-service-group")
+    @KafkaListener(topics = ["01.orders.created"], groupId = "notification-service-group")
     fun handleOrderCreated(record: ConsumerRecord<String, OrderCreatedEvent>) {
         val event = record.value()
         val count = receivedCount.incrementAndGet()

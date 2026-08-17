@@ -9,7 +9,7 @@ import org.springframework.kafka.config.TopicBuilder
 class KafkaTopicConfig {
 
     @Bean
-    fun ordersCreatedTopic(): NewTopic = TopicBuilder.name("orders.created")
+    fun ordersCreatedTopic(): NewTopic = TopicBuilder.name("01.orders.created")
         .partitions(1)
         .replicas(1)
         .build()

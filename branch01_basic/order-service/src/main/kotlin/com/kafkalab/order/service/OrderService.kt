@@ -10,7 +10,7 @@ class OrderService(
     private val kafkaTemplate: KafkaTemplate<String, OrderCreatedEvent>
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    private val topic = "orders.created"
+    private val topic = "01.orders.created"
 
     fun createOrder(userId: String, product: String, quantity: Int, totalAmount: Double): OrderCreatedEvent {
         val event = OrderCreatedEvent(userId = userId, product = product, quantity = quantity, totalAmount = totalAmount)
