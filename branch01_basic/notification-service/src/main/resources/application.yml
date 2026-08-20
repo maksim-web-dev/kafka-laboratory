@@ -12,5 +12,6 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.kafkalab.notification.model.OrderCreatedEvent
+        spring.json.trusted.packages: "com.kafkalab.*"
+        # branch02: аліаси з producer маппуються на локальні класи notification-service
+        spring.json.type.mapping: "OrderCreatedEvent:com.kafkalab.notification.model.OrderCreatedEvent,OrderCancelledEvent:com.kafkalab.notification.model.OrderCancelledEvent"

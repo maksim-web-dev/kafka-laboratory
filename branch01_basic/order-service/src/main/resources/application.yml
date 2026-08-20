@@ -10,4 +10,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
+        # branch02: type headers увімкнено — consumer визначає тип за заголовком
+        spring.json.add.type.headers: true
+        # Аліаси: короткі імена у заголовку замість повного package-шляху
+        spring.json.type.mapping: "OrderCreatedEvent:com.kafkalab.order.model.OrderCreatedEvent,OrderCancelledEvent:com.kafkalab.order.model.OrderCancelledEvent"
