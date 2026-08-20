@@ -15,7 +15,8 @@ class OrderEventListener {
     private val createdCount = AtomicInteger(0)
     private val cancelledCount = AtomicInteger(0)
 
-    @KafkaListener(topics = ["02.orders.created"], groupId = "notification-service-group")
+    @KafkaListener(topics = ["02.orders.created"])
+//    @KafkaListener(topics = ["02.orders.created"], groupId = "notification-service-group")
     fun handleOrderCreated(record: ConsumerRecord<String, OrderCreatedEvent>) {
         val event = record.value()
         val count = createdCount.incrementAndGet()
@@ -32,7 +33,7 @@ class OrderEventListener {
         log.info("──────────────────────────────────────")
     }
 
-    @KafkaListener(topics = ["02.orders.cancelled"], groupId = "notification-service-group")
+    @KafkaListener(topics = ["02.orders.cancelled"])
     fun handleOrderCancelled(record: ConsumerRecord<String, OrderCancelledEvent>) {
         val event = record.value()
         val count = cancelledCount.incrementAndGet()
