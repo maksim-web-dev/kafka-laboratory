@@ -69,6 +69,12 @@ curl -s -X POST http://localhost:8081/api/orders \
     "totalAmount": 59.99
   }' | jq
 ```
+або у Windows OS
+```cmd
+curl -s -X POST http://localhost:8081/api/orders ^
+  -H "Content-Type: application/json" ^
+  -d "{\"userId\": \"user-42\", \"product\": \"Kafka: The Definitive Guide\", \"quantity\": 2, \"totalAmount\": 59.99}"
+```
 
 Відповідь:
 ```json
