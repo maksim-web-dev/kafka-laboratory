@@ -48,6 +48,7 @@ docker compose -f docker-compose-01.yml up --build
 Наступні запуски — швидкі.
 
 Перевірити готовність:
+Необхідно подивитись у docker-compose або виконати команду
 ```bash
 docker compose -f docker-compose-01.yml ps
 # всі 4 сервіси мають бути у стані "healthy" або "running"
