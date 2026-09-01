@@ -27,3 +27,7 @@ include("branch08_consumer_configuration:order-service")
 
 include("branch09_error_retry:order-service")
 include("branch09_error_retry:payment-service")
+
+include("branch10_json_serialization:order-service")
+include("branch10_json_serialization:payment-service")
+include("branch10_json_serialization:notification-service")
