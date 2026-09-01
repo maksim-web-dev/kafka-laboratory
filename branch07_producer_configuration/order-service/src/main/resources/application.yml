@@ -1,0 +1,21 @@
+server:
+  port: 8109
+
+spring:
+  application:
+    name: order-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
+        spring.json.type.mapping: "OrderCreatedEvent:com.kafkalab.order.model.OrderCreatedEvent,OrderCancelledEvent:com.kafkalab.order.model.OrderCancelledEvent"
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        delivery.timeout.ms: 30000
+        linger.ms: 20
+        batch.size: 65536
+        retries: 2147483647

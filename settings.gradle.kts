@@ -18,3 +18,6 @@ include("branch05_multiple_consumer_groups:order-service")
 
 include("branch06_offsets_commits:notification-service")
 include("branch06_offsets_commits:order-service")
+
+include("branch07_producer_configuration:notification-service")
+include("branch07_producer_configuration:order-service")
