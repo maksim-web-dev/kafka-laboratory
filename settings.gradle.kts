@@ -15,3 +15,6 @@ include("branch04_customer_groups:order-service")
 include("branch05_multiple_consumer_groups:analytics-service")
 include("branch05_multiple_consumer_groups:notification-service")
 include("branch05_multiple_consumer_groups:order-service")
+
+include("branch06_offsets_commits:notification-service")
+include("branch06_offsets_commits:order-service")

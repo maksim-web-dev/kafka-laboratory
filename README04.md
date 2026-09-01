@@ -113,7 +113,7 @@ group.instance.id: notification-service-1
 
 ```bash
 # Зупинити branch03 якщо запущено
-docker stop kafka-b03 kafka-ui-b03 order-service-b03 notification-service-b03 2>/dev/null || true
+docker stop kafka kafka-ui b03-order-service b03-notification-service 2>/dev/null || true
 
 # Запустити branch04 (чисті volumes)
 docker compose -f docker-compose-04.yml down -v 2>/dev/null || true
@@ -130,7 +130,7 @@ docker compose -f docker-compose-04.yml up --build
 
 ```bash
 docker compose -f docker-compose-04.yml ps
-# kafka-b04, kafka-ui-b04, order-service-b04
+# kafka, kafka-ui, order-service-b04
 # notification-service-1-b04, notification-service-2-b04, notification-service-3-b04
 ```
 
@@ -224,7 +224,7 @@ docker start notification-service-3-b04
 
 ```bash
 # Реальний розподіл партицій + lag
-docker exec kafka-b04 kafka-consumer-groups \
+docker exec kafka kafka-consumer-groups \
   --bootstrap-server localhost:9092 \
   --describe --group notification-service-group
 ```
