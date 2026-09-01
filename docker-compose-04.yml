@@ -1,0 +1,86 @@
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka-b04
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9098
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9098
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+    ports:
+      - "9098:9098"
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui-b04
+    ports:
+      - "8088:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=branch04
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  order-service:
+    build: branch04_customer_groups/order-service
+    container_name: order-service-b04
+    ports:
+      - "8095:8095"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  notification-service-1:
+    build: branch04_customer_groups/notification-service
+    container_name: notification-service-1-b04
+    ports:
+      - "8096:8096"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - INSTANCE_ID=notification-service-1
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  notification-service-2:
+    build: branch04_customer_groups/notification-service
+    container_name: notification-service-2-b04
+    ports:
+      - "8097:8096"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - INSTANCE_ID=notification-service-2
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  notification-service-3:
+    build: branch04_customer_groups/notification-service
+    container_name: notification-service-3-b04
+    ports:
+      - "8098:8096"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - INSTANCE_ID=notification-service-3
+    depends_on:
+      kafka:
+        condition: service_healthy
