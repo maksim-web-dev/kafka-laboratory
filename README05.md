@@ -83,7 +83,7 @@ docker compose -f docker-compose-05.yml up --build
 
 ```bash
 docker compose -f docker-compose-05.yml ps
-# kafka-b05, kafka-ui-b05, order-service-b05
+# kafka, kafka-ui, order-service-b05
 # notification-service-b05, analytics-service-b05
 ```
 
@@ -167,7 +167,7 @@ curl -s http://localhost:8103/api/analytics/stats | jq '.totalOrders, .ordersByU
 
 ```bash
 # Поки analytics зупинений:
-docker exec kafka-b05 kafka-consumer-groups \
+docker exec kafka kafka-consumer-groups \
   --bootstrap-server localhost:9092 \
   --describe --group analytics-service-group
 
@@ -180,7 +180,7 @@ docker exec kafka-b05 kafka-consumer-groups \
 
 ```bash
 # notification-service не відстає
-docker exec kafka-b05 kafka-consumer-groups \
+docker exec kafka kafka-consumer-groups \
   --bootstrap-server localhost:9092 \
   --describe --group notification-service-group
 # LAG = 0 для всіх партицій
@@ -234,7 +234,7 @@ analytics-service-group читає той самий partition 1:
 Якщо запустити нову consumer group (або скинути offset через CLI):
 
 ```bash
-docker exec kafka-b05 kafka-consumer-groups \
+docker exec kafka kafka-consumer-groups \
   --bootstrap-server localhost:9092 \
   --group analytics-service-group \
   --topic orders.created \
