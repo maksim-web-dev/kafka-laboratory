@@ -24,3 +24,6 @@ include("branch07_producer_configuration:order-service")
 
 include("branch08_consumer_configuration:notification-service")
 include("branch08_consumer_configuration:order-service")
+
+include("branch09_error_retry:order-service")
+include("branch09_error_retry:payment-service")
