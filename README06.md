@@ -43,12 +43,12 @@ Consumer: отримав → почав обробляти → crash перед 
 Consumer: знову отримує offset 5 → обробляє вдруге → ack.acknowledge()
 ```
 
-### nack(sleepMillis)
+### nack(Duration)
 
-`ack.nack(2000L)` — відхилити повідомлення та затримати повторну доставку на 2 секунди:
+`ack.nack(Duration.ofSeconds(2))` — відхилити повідомлення та затримати повторну доставку на 2 секунди:
 
 ```
-Consumer: отримав offset 5 → failNextN > 0 → ack.nack(2000L)
+Consumer: отримав offset 5 → failNextN > 0 → ack.nack(Duration.ofSeconds(2))
 Через 2 секунди: offset 5 доставляється знову
 (offset не фіксується — наступні повідомлення в партиції не читаються)
 ```

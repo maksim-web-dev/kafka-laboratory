@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
+import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 
 @Component
@@ -27,7 +28,7 @@ class OrderEventListener(
             redeliveredCount.incrementAndGet()
             log.warn("[SIMULATED FAILURE] nacking partition={} offset={} — redelivery in 2s",
                 record.partition(), record.offset())
-            ack.nack(2000L)
+            ack.nack(Duration.ofSeconds(2))
             return
         }
 
