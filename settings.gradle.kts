@@ -5,3 +5,6 @@ include("branch01_basic:order-service")
 
 include("branch02_topics_partitions:notification-service")
 include("branch02_topics_partitions:order-service")
+
+include("branch03_keys:notification-service")
+include("branch03_keys:order-service")
