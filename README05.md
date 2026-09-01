@@ -71,7 +71,7 @@ analytics-service-group    | orders.created | partition 2 → offset 18
 
 ```bash
 # Зупинити branch04
-docker stop kafka-b04 kafka-ui-b04 order-service-b04 \
+docker stop kafka kafka-ui order-service-b04 \
   notification-service-1-b04 notification-service-2-b04 notification-service-3-b04 2>/dev/null || true
 
 # Запустити branch05
