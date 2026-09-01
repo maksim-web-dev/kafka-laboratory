@@ -1,0 +1,19 @@
+server:
+  port: 8102
+
+spring:
+  application:
+    name: notification-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.type.mapping: "OrderCreatedEvent:com.kafkalab.notification.model.OrderCreatedEvent,OrderCancelledEvent:com.kafkalab.notification.model.OrderCancelledEvent"
+
+instance:
+  id: ${INSTANCE_ID:notification-service-1}
