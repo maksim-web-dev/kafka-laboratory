@@ -1,0 +1,18 @@
+server:
+  port: 8133
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9113}
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8130}
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      isolation-level: read-committed
+      properties:
+        specific.avro.reader: true
+    admin:
+      auto-create: false

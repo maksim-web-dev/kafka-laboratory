@@ -1,0 +1,29 @@
+server:
+  port: 8132
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9113}
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8130}
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        specific.avro.reader: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+      transaction-id-prefix: payment-tx-
+    admin:
+      auto-create: false
+
+kafka:
+  topics:
+    payments-processed: 12.payments.processed

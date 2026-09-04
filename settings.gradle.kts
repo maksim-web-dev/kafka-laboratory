@@ -35,3 +35,7 @@ include("branch10_json_serialization:notification-service")
 include("branch11_schema_registry:order-service")
 include("branch11_schema_registry:payment-service")
 include("branch11_schema_registry:notification-service")
+
+include("branch12_idempotent_producer:order-service")
+include("branch12_idempotent_producer:payment-service")
+include("branch12_idempotent_producer:notification-service")

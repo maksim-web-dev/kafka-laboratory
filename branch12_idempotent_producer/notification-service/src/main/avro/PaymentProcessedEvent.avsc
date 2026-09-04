@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "PaymentProcessedEvent",
+  "namespace": "com.kafkalab.avro",
+  "doc": "Fired when payment processing completes",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "paymentId",    "type": "string", "default": ""},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "amount",       "type": "double", "default": 0.0},
+    {"name": "status",       "type": "string", "default": ""},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

@@ -1,0 +1,22 @@
+server:
+  port: 8131
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9113}
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8130}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+    admin:
+      auto-create: false
+
+kafka:
+  topics:
+    orders-created: 12.orders.created
