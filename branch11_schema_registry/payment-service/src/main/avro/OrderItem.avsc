@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "OrderItem",
+  "namespace": "com.kafkalab.avro",
+  "fields": [
+    {"name": "productId",   "type": "string", "default": ""},
+    {"name": "productName", "type": "string", "default": ""},
+    {"name": "quantity",    "type": "int",    "default": 0},
+    {"name": "unitPrice",   "type": "double", "default": 0.0}
+  ]
+}

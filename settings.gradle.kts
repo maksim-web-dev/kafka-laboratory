@@ -31,3 +31,7 @@ include("branch09_error_retry:payment-service")
 include("branch10_json_serialization:order-service")
 include("branch10_json_serialization:payment-service")
 include("branch10_json_serialization:notification-service")
+
+include("branch11_schema_registry:order-service")
+include("branch11_schema_registry:payment-service")
+include("branch11_schema_registry:notification-service")

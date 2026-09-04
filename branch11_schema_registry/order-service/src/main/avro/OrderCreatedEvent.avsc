@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "OrderCreatedEvent",
+  "namespace": "com.kafkalab.avro",
+  "doc": "Fired when a new order is placed",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "items",        "type": {"type": "array", "items": "com.kafkalab.avro.OrderItem"}, "default": []},
+    {"name": "totalAmount",  "type": "double", "default": 0.0},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}
