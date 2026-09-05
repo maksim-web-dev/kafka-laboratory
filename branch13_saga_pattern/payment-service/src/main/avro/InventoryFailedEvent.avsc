@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "InventoryFailedEvent",
+  "namespace": "com.kafkalab.avro",
+  "doc": "Saga compensation trigger: inventory unavailable, payment must be refunded",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "reason",       "type": "string", "default": ""},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "InventoryReservedEvent",
+  "namespace": "com.kafkalab.avro",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

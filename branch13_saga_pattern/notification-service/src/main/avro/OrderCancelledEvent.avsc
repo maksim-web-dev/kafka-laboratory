@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "OrderCancelledEvent",
+  "namespace": "com.kafkalab.avro",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "reason",       "type": "string", "default": ""},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

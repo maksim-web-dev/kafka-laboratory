@@ -39,3 +39,8 @@ include("branch11_schema_registry:notification-service")
 include("branch12_idempotent_producer:order-service")
 include("branch12_idempotent_producer:payment-service")
 include("branch12_idempotent_producer:notification-service")
+
+include("branch13_saga_pattern:order-service")
+include("branch13_saga_pattern:payment-service")
+include("branch13_saga_pattern:inventory-service")
+include("branch13_saga_pattern:notification-service")
