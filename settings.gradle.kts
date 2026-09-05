@@ -47,3 +47,5 @@ include("branch13_saga_pattern:notification-service")
 
 include("branch14_streams:order-service")
 include("branch14_streams:analytics-service")
+
+include("branch15_connect_cdc_debezium:order-service")

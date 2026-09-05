@@ -1,0 +1,20 @@
+{
+  "name": "orders-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "ordersdb",
+    "topic.prefix": "postgres",
+    "table.include.list": "public.orders",
+    "plugin.name": "pgoutput",
+    "slot.name": "debezium_slot",
+    "publication.name": "debezium_pub",
+    "publication.autocreate.mode": "filtered",
+    "decimal.handling.mode": "double",
+    "heartbeat.interval.ms": "5000"
+  }
+}
