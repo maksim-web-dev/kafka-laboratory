@@ -52,3 +52,6 @@ include("branch15_connect_cdc_debezium:order-service")
 
 include("branch16_cluster_replication:order-service")
 include("branch16_cluster_replication:notification-service")
+
+include("branch17_observability:order-service")
+include("branch17_observability:notification-service")

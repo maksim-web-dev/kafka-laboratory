@@ -1,0 +1,171 @@
+{
+  "title": "Kafka Observability — Branch 17",
+  "uid": "kafka-b17",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-10m", "to": "now" },
+  "timezone": "browser",
+  "tags": ["kafka", "branch17"],
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Consumer Lag (total)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [{
+        "expr": "sum(kafka_consumergroup_lag{consumergroup=\"notification-service-group\",topic=\"17.orders.created\"})",
+        "legendFormat": "Lag"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background", "graphMode": "none", "textMode": "value_and_name"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 200 }
+            ]
+          }
+        }, "overrides": []
+      }
+    },
+    {
+      "id": 2, "type": "stat", "title": "Messages in Topic",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [{
+        "expr": "sum(kafka_topic_partition_current_offset{topic=\"17.orders.created\"})",
+        "legendFormat": "Total"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value", "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3, "type": "stat", "title": "Consumer Offset",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [{
+        "expr": "sum(kafka_consumergroup_current_offset{consumergroup=\"notification-service-group\",topic=\"17.orders.created\"})",
+        "legendFormat": "Consumed"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value", "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4, "type": "stat", "title": "Active Brokers",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [{ "expr": "kafka_brokers", "legendFormat": "Brokers" }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background", "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }, "overrides": []
+      }
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Consumer Lag Over Time",
+      "description": "Spike = flood sent; drop = consumer catching up",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [
+        {
+          "expr": "sum(kafka_consumergroup_lag{consumergroup=\"notification-service-group\",topic=\"17.orders.created\"})",
+          "legendFormat": "Total Lag"
+        },
+        {
+          "expr": "kafka_consumergroup_lag{consumergroup=\"notification-service-group\",topic=\"17.orders.created\"}",
+          "legendFormat": "Partition {{partition}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "short",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }, "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] }
+      }
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Producer vs Consumer Offset",
+      "description": "Gap between lines = current lag",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [
+        {
+          "expr": "sum(kafka_topic_partition_current_offset{topic=\"17.orders.created\"})",
+          "legendFormat": "Producer (latest offset)"
+        },
+        {
+          "expr": "sum(kafka_consumergroup_current_offset{consumergroup=\"notification-service-group\",topic=\"17.orders.created\"})",
+          "legendFormat": "Consumer (committed offset)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "short",
+          "custom": { "lineWidth": 2, "fillOpacity": 5 }
+        }, "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      }
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "Messages/sec (Production Rate)",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus-b17" },
+      "targets": [{
+        "expr": "sum(rate(kafka_topic_partition_current_offset{topic=\"17.orders.created\"}[30s]))",
+        "legendFormat": "msgs/sec"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "reqps",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }, "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      }
+    }
+  ],
+  "templating": { "list": [] }
+}

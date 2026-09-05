@@ -1,0 +1,17 @@
+server:
+  port: 8185
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9120}
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        # 1 message per poll — makes lag visible per message, not per batch
+        max.poll.records: 1
+        # Long interval so paused consumer is not evicted from group
+        max.poll.interval.ms: 600000
