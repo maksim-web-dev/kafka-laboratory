@@ -11,6 +11,8 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.kafkalab.notification.model.OrderCreatedEvent
+        spring.json.use.type.headers: false
         # 1 message per poll — makes lag visible per message, not per batch
         max.poll.records: 1
         # Long interval so paused consumer is not evicted from group
