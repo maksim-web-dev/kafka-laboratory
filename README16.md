@@ -12,13 +12,13 @@
 ## Архітектура
 
 ```
-                 ┌─────────────────────────────────┐
+                 ┌──────────────────────────────────┐
                  │  Kafka Cluster (KRaft, 3 nodes)  │
                  │                                  │
   order-service ─►  kafka-1 (broker+controller)     │
    acks=all      │  kafka-2 (broker+controller)     │
                  │  kafka-3 (broker+controller)     │
-                 └───────────┬─────────────────────┘
+                 └───────────┬──────────────────────┘
                              │
                     topic: 16.orders.created
                     partitions=3, replicas=3
