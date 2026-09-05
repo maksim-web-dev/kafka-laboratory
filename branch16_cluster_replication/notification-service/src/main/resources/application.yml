@@ -1,0 +1,16 @@
+server:
+  port: 8170
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9117,localhost:9118,localhost:9119}
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        # Consumer continues if its coordinator broker is alive, even if others are down
+        session.timeout.ms: 15000
+        heartbeat.interval.ms: 5000
