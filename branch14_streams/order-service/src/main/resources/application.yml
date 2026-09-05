@@ -1,0 +1,14 @@
+server:
+  port: 8142
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9115}
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8141}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: all
+    admin:
+      auto-create: false

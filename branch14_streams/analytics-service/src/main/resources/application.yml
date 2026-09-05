@@ -1,0 +1,16 @@
+server:
+  port: 8143
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9115}
+    streams:
+      application-id: analytics-service
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8141}
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+        commit.interval.ms: 1000
+
+schema-registry:
+  url: ${SCHEMA_REGISTRY_URL:http://localhost:8141}

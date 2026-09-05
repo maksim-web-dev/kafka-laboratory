@@ -44,3 +44,6 @@ include("branch13_saga_pattern:order-service")
 include("branch13_saga_pattern:payment-service")
 include("branch13_saga_pattern:inventory-service")
 include("branch13_saga_pattern:notification-service")
+
+include("branch14_streams:order-service")
+include("branch14_streams:analytics-service")
