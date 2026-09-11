@@ -1,0 +1,86 @@
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9121
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9121
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:SASL_PLAINTEXT,PLAINTEXT_HOST:SASL_PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      # ACL enforcement
+      - KAFKA_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      - KAFKA_SUPER_USERS=User:admin
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - CLUSTER_ID=5M6h4nTiU-fNCwL--Y97tx
+      # Load JAAS config for SASL users
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf
+    ports:
+      - "9121:9121"
+    volumes:
+      - ./branch18_security/kafka:/etc/kafka/secrets:ro
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --command-config /etc/kafka/secrets/admin.conf --list > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+
+  # Runs once: creates topic + configures ACLs using admin credentials
+  acl-init:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: acl-init-b18
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./branch18_security/kafka:/etc/kafka/secrets:ro
+    entrypoint: ["/bin/bash", "/etc/kafka/secrets/acl-init.sh"]
+    restart: "no"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8186:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=branch18-security
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  order-service:
+    build: branch18_security/order-service
+    container_name: order-service-b18
+    ports:
+      - "8187:8187"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="order-producer" password="order-secret";
+    depends_on:
+      acl-init:
+        condition: service_completed_successfully
+
+  notification-service:
+    build: branch18_security/notification-service
+    container_name: notification-service-b18
+    ports:
+      - "8188:8188"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="notification-consumer" password="notif-secret";
+    depends_on:
+      acl-init:
+        condition: service_completed_successfully

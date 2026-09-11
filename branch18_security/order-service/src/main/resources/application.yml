@@ -1,0 +1,19 @@
+server:
+  port: 8187
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9121}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: "1"
+      retries: 3
+    # SASL/PLAIN credentials for order-producer user
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG:org.apache.kafka.common.security.plain.PlainLoginModule required username="order-producer" password="order-secret";}
+
+app:
+  topic: 18.orders.created

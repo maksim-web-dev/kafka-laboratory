@@ -55,3 +55,6 @@ include("branch16_cluster_replication:notification-service")
 
 include("branch17_observability:order-service")
 include("branch17_observability:notification-service")
+
+include("branch18_security:order-service")
+include("branch18_security:notification-service")
