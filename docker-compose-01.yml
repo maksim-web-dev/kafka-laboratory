@@ -1,3 +1,5 @@
+name: branch01
+
 services:
 
   kafka:
@@ -16,7 +18,7 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      - CLUSTER_ID=4L6g3nShT-eMCtK-b01Zsw
     ports:
       - "9092:9092"
     healthcheck:
@@ -32,6 +34,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - DYNAMIC_CONFIG_ENABLED=true
       - KAFKA_CLUSTERS_0_NAME=branch01
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
@@ -59,3 +62,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+networks:
+  default:
+    external: true
+    name: kafka-lab

@@ -58,3 +58,8 @@ include("branch17_observability:notification-service")
 
 include("branch18_security:order-service")
 include("branch18_security:notification-service")
+
+include("branch19_production:order-service")
+include("branch19_production:payment-service")
+include("branch19_production:inventory-service")
+include("branch19_production:notification-service")

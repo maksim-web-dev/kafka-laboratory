@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "PaymentRefundedEvent",
+  "namespace": "com.kafkalab.avro",
+  "doc": "Saga compensation action: payment refunded after inventory failure",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "amount",       "type": "double", "default": 0.0},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

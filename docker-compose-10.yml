@@ -1,3 +1,5 @@
+name: branch10
+
 services:
 
   kafka:
@@ -7,18 +9,18 @@ services:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
       - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9110
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9110
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      - CLUSTER_ID=4L6g3nShT-eMCtK-b10Zsw
     ports:
-      - "9110:9110"
+      - "9092:9092"
     healthcheck:
       test: [ "CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list" ]
       interval: 10s
@@ -30,10 +32,29 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
-      - "8120:8080"
+      - "8080:8080"
     environment:
-      - KAFKA_CLUSTERS_0_NAME=branch10
+      - DYNAMIC_CONFIG_ENABLED=true
+      - KAFKA_CLUSTERS_0_NAME=branch01
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_1_NAME=branch02
+      - KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_2_NAME=branch03
+      - KAFKA_CLUSTERS_2_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_3_NAME=branch04
+      - KAFKA_CLUSTERS_3_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_4_NAME=branch05
+      - KAFKA_CLUSTERS_4_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_5_NAME=branch06
+      - KAFKA_CLUSTERS_5_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_6_NAME=branch07
+      - KAFKA_CLUSTERS_6_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_7_NAME=branch08
+      - KAFKA_CLUSTERS_7_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_8_NAME=branch09
+      - KAFKA_CLUSTERS_8_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_9_NAME=branch10
+      - KAFKA_CLUSTERS_9_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
       kafka:
         condition: service_healthy
@@ -71,3 +92,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+networks:
+  default:
+    external: true
+    name: kafka-lab

@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "OrderConfirmedEvent",
+  "namespace": "com.kafkalab.avro",
+  "doc": "Saga happy path complete: order confirmed",
+  "fields": [
+    {"name": "eventVersion", "type": "string", "default": "1.0"},
+    {"name": "orderId",      "type": "string", "default": ""},
+    {"name": "userId",       "type": "string", "default": ""},
+    {"name": "timestamp",    "type": "string", "default": ""}
+  ]
+}

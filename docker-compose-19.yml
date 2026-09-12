@@ -1,0 +1,273 @@
+name: branch19
+
+services:
+
+  kafka-b19-1:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka-b19-1
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-b19-1:9093,2@kafka-b19-2:9093,3@kafka-b19-3:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9094
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-b19-1:9092,PLAINTEXT_HOST://localhost:9122
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:SASL_PLAINTEXT,PLAINTEXT_HOST:SASL_PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      - KAFKA_SUPER_USERS=User:admin
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - CLUSTER_ID=9S1l9sZpY-kTIaR--D19gh
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf
+    ports:
+      - "9122:9094"
+    volumes:
+      - ./branch19_production/kafka:/etc/kafka/secrets:ro
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --command-config /etc/kafka/secrets/admin.conf --list > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+
+  kafka-b19-2:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka-b19-2
+    environment:
+      - KAFKA_NODE_ID=2
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-b19-1:9093,2@kafka-b19-2:9093,3@kafka-b19-3:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9094
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-b19-2:9092,PLAINTEXT_HOST://localhost:9123
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:SASL_PLAINTEXT,PLAINTEXT_HOST:SASL_PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      - KAFKA_SUPER_USERS=User:admin
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - CLUSTER_ID=9S1l9sZpY-kTIaR--D19gh
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf
+    ports:
+      - "9123:9094"
+    volumes:
+      - ./branch19_production/kafka:/etc/kafka/secrets:ro
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --command-config /etc/kafka/secrets/admin.conf --list > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+
+  kafka-b19-3:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka-b19-3
+    environment:
+      - KAFKA_NODE_ID=3
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka-b19-1:9093,2@kafka-b19-2:9093,3@kafka-b19-3:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9094
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-b19-3:9092,PLAINTEXT_HOST://localhost:9124
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:SASL_PLAINTEXT,PLAINTEXT_HOST:SASL_PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      - KAFKA_SUPER_USERS=User:admin
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - CLUSTER_ID=9S1l9sZpY-kTIaR--D19gh
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf
+    ports:
+      - "9124:9094"
+    volumes:
+      - ./branch19_production/kafka:/etc/kafka/secrets:ro
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --command-config /etc/kafka/secrets/admin.conf --list > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 30s
+
+  init-topics:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: init-topics-b19
+    depends_on:
+      kafka-b19-1:
+        condition: service_healthy
+      kafka-b19-2:
+        condition: service_healthy
+      kafka-b19-3:
+        condition: service_healthy
+    volumes:
+      - ./branch19_production/kafka:/etc/kafka/secrets:ro
+    entrypoint: ["/bin/bash", "/etc/kafka/secrets/init.sh"]
+    restart: "no"
+
+  schema-registry-b19:
+    image: confluentinc/cp-schema-registry:8.0.1
+    container_name: schema-registry-b19
+    ports:
+      - "8191:8081"
+    environment:
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry-b19
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM=PLAIN
+      - SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+    depends_on:
+      kafka-b19-1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/subjects"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  kafka-ui-b19:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui-b19
+    ports:
+      - "8192:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=branch19-production
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_PLAINTEXT
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+      - KAFKA_CLUSTERS_0_SCHEMAREGISTRY=http://schema-registry-b19:8081
+    depends_on:
+      schema-registry-b19:
+        condition: service_healthy
+
+  kafka-exporter-b19:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter-b19
+    command:
+      - --kafka.server=kafka-b19-1:9092
+      - --kafka.server=kafka-b19-2:9092
+      - --kafka.server=kafka-b19-3:9092
+      - --sasl.enabled
+      - --sasl.username=admin
+      - --sasl.password=admin-secret
+      - --sasl.mechanism=PLAIN
+    depends_on:
+      kafka-b19-1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9308/metrics || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  prometheus-b19:
+    image: prom/prometheus:latest
+    container_name: prometheus-b19
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./branch19_production/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    depends_on:
+      kafka-exporter-b19:
+        condition: service_healthy
+
+  grafana-b19:
+    image: grafana/grafana:latest
+    container_name: grafana-b19
+    ports:
+      - "3019:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./branch19_production/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./branch19_production/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus-b19
+
+  order-service:
+    build: branch19_production/order-service
+    container_name: order-service-b19
+    ports:
+      - "8193:8193"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - SCHEMA_REGISTRY_URL=http://schema-registry-b19:8081
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="order-producer" password="order-secret";
+    depends_on:
+      init-topics:
+        condition: service_completed_successfully
+      schema-registry-b19:
+        condition: service_healthy
+
+  payment-service:
+    build: branch19_production/payment-service
+    container_name: payment-service-b19
+    ports:
+      - "8194:8194"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - SCHEMA_REGISTRY_URL=http://schema-registry-b19:8081
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="payment-processor" password="payment-secret";
+    depends_on:
+      init-topics:
+        condition: service_completed_successfully
+      schema-registry-b19:
+        condition: service_healthy
+
+  inventory-service:
+    build: branch19_production/inventory-service
+    container_name: inventory-service-b19
+    ports:
+      - "8195:8195"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - SCHEMA_REGISTRY_URL=http://schema-registry-b19:8081
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="inventory-worker" password="inventory-secret";
+    depends_on:
+      init-topics:
+        condition: service_completed_successfully
+      schema-registry-b19:
+        condition: service_healthy
+
+  notification-service:
+    build: branch19_production/notification-service
+    container_name: notification-service-b19
+    ports:
+      - "8196:8196"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-b19-1:9092,kafka-b19-2:9092,kafka-b19-3:9092
+      - SCHEMA_REGISTRY_URL=http://schema-registry-b19:8081
+      - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="notification-consumer" password="notif-secret";
+    depends_on:
+      init-topics:
+        condition: service_completed_successfully
+      schema-registry-b19:
+        condition: service_healthy

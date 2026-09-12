@@ -1,3 +1,5 @@
+name: branch15
+
 services:
 
   kafka:
@@ -7,18 +9,18 @@ services:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
       - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9116
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9116
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - CLUSTER_ID=4L6g3nShT-eMCtK--X86sw
+      - CLUSTER_ID=4L6g3nShT-eMCtK-b15Zsw
     ports:
-      - "9116:9116"
+      - "9092:9092"
     healthcheck:
       test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 10s
@@ -30,22 +32,54 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     ports:
-      - "8140:8080"
+      - "8080:8080"
     environment:
-      - KAFKA_CLUSTERS_0_NAME=branch15
+      - DYNAMIC_CONFIG_ENABLED=true
+      - KAFKA_CLUSTERS_0_NAME=branch01
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_1_NAME=branch02
+      - KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_2_NAME=branch03
+      - KAFKA_CLUSTERS_2_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_3_NAME=branch04
+      - KAFKA_CLUSTERS_3_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_4_NAME=branch05
+      - KAFKA_CLUSTERS_4_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_5_NAME=branch06
+      - KAFKA_CLUSTERS_5_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_6_NAME=branch07
+      - KAFKA_CLUSTERS_6_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_7_NAME=branch08
+      - KAFKA_CLUSTERS_7_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_8_NAME=branch09
+      - KAFKA_CLUSTERS_8_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_9_NAME=branch10
+      - KAFKA_CLUSTERS_9_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_10_NAME=branch11
+      - KAFKA_CLUSTERS_10_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_10_SCHEMAREGISTRY=http://schema-registry-b11:8081
+      - KAFKA_CLUSTERS_11_NAME=branch12
+      - KAFKA_CLUSTERS_11_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_11_SCHEMAREGISTRY=http://schema-registry-b12:8081
+      - KAFKA_CLUSTERS_12_NAME=branch13
+      - KAFKA_CLUSTERS_12_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_12_SCHEMAREGISTRY=http://schema-registry-b13:8081
+      - KAFKA_CLUSTERS_13_NAME=branch14
+      - KAFKA_CLUSTERS_13_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_13_SCHEMAREGISTRY=http://schema-registry-b14:8081
+      - KAFKA_CLUSTERS_14_NAME=branch15
+      - KAFKA_CLUSTERS_14_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
       kafka:
         condition: service_healthy
 
-  postgres:
+  postgres-b15:
     image: postgres:16
-    container_name: postgres
+    container_name: postgres-b15
     environment:
       - POSTGRES_DB=ordersdb
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    # wal_level=logical is required for Debezium CDC
     command: postgres -c wal_level=logical -c max_replication_slots=4 -c max_wal_senders=4
     ports:
       - "5416:5432"
@@ -56,14 +90,14 @@ services:
       retries: 10
       start_period: 10s
 
-  kafka-connect:
+  kafka-connect-b15:
     build: branch15_connect_cdc_debezium/connect
-    container_name: kafka-connect
+    container_name: kafka-connect-b15
     ports:
       - "8161:8083"
     environment:
       - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
-      - CONNECT_REST_ADVERTISED_HOST_NAME=kafka-connect
+      - CONNECT_REST_ADVERTISED_HOST_NAME=kafka-connect-b15
       - CONNECT_REST_PORT=8083
       - CONNECT_GROUP_ID=connect-cluster
       - CONNECT_CONFIG_STORAGE_TOPIC=connect-configs
@@ -80,7 +114,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      postgres:
+      postgres-b15:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8083/connectors"]
@@ -89,9 +123,9 @@ services:
       retries: 15
       start_period: 90s
 
-  elasticsearch:
+  elasticsearch-b15:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
-    container_name: elasticsearch
+    container_name: elasticsearch-b15
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -106,38 +140,38 @@ services:
       retries: 20
       start_period: 60s
 
-  kibana:
+  kibana-b15:
     image: docker.elastic.co/kibana/kibana:8.15.0
-    container_name: kibana
+    container_name: kibana-b15
     ports:
       - "5616:5601"
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-b15:9200
     depends_on:
-      elasticsearch:
+      elasticsearch-b15:
         condition: service_healthy
 
-  connect-init:
+  connect-init-b15:
     image: curlimages/curl:latest
-    container_name: connect-init
+    container_name: connect-init-b15
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         echo "Registering Debezium PostgreSQL source connector..." &&
         curl -sf -X POST -H "Content-Type: application/json" \
           --data @/connectors/debezium-source.json \
-          http://kafka-connect:8083/connectors &&
+          http://kafka-connect-b15:8083/connectors &&
         echo "" && echo "Registering Elasticsearch sink connector..." &&
         curl -sf -X POST -H "Content-Type: application/json" \
           --data @/connectors/elasticsearch-sink.json \
-          http://kafka-connect:8083/connectors &&
+          http://kafka-connect-b15:8083/connectors &&
         echo "" && echo "All connectors registered!"
     volumes:
       - ./branch15_connect_cdc_debezium/connect:/connectors:ro
     depends_on:
-      kafka-connect:
+      kafka-connect-b15:
         condition: service_healthy
-      elasticsearch:
+      elasticsearch-b15:
         condition: service_healthy
     restart: "no"
 
@@ -147,7 +181,12 @@ services:
     ports:
       - "8162:8162"
     environment:
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=postgres-b15
     depends_on:
-      postgres:
+      postgres-b15:
         condition: service_healthy
+
+networks:
+  default:
+    external: true
+    name: kafka-lab
