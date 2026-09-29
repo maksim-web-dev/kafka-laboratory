@@ -61,7 +61,7 @@ services:
     build: branch09_error_retry/order-service
     container_name: order-service-b09
     ports:
-      - "8117:8117"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -72,7 +72,7 @@ services:
     build: branch09_error_retry/payment-service
     container_name: payment-service-b09
     ports:
-      - "8118:8118"
+      - "8083:8083"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:

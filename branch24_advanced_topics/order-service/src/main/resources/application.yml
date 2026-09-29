@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service-advanced
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # lz4 compression: best balance of speed and ratio for most workloads
+      compression-type: lz4
+      acks: all
+      retries: 3
+      properties:
+        spring.json.add.type.headers: false
+        # ProducerInterceptor chain — applied in order
+        interceptor.classes: >
+          com.kafkalab.order.interceptor.HeaderEnrichmentInterceptor,
+          com.kafkalab.order.interceptor.MetricsProducerInterceptor
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5

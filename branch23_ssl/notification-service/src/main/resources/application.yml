@@ -1,0 +1,27 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: notification-service-ssl
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.kafkalab.notification.model.OrderCreatedEvent
+    properties:
+      # SASL_SSL security configuration
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: >
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="notification-consumer"
+        password="notification-consumer-secret";
+      ssl.truststore.location: ${SSL_TRUSTSTORE_PATH:/certs/client.truststore.jks}
+      ssl.truststore.password: ${SSL_TRUSTSTORE_PASSWORD:kafkalab-ssl-secret}
+      ssl.endpoint.identification.algorithm: ""

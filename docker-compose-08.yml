@@ -59,7 +59,7 @@ services:
     build: branch08_consumer_configuration/order-service
     container_name: order-service-b08
     ports:
-      - "8113:8113"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -70,7 +70,7 @@ services:
     build: branch08_consumer_configuration/notification-service
     container_name: notification-service-1-b08
     ports:
-      - "8114:8114"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - INSTANCE_ID=notification-1
@@ -82,7 +82,7 @@ services:
     build: branch08_consumer_configuration/notification-service
     container_name: notification-service-2-b08
     ports:
-      - "8115:8114"
+      - "8083:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - INSTANCE_ID=notification-2

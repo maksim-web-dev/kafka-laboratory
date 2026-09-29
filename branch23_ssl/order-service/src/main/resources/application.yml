@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service-ssl
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    properties:
+      # SASL_SSL security configuration
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: >
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="order-producer"
+        password="order-producer-secret";
+      # SSL truststore to verify broker certificate
+      ssl.truststore.location: ${SSL_TRUSTSTORE_PATH:/certs/client.truststore.jks}
+      ssl.truststore.password: ${SSL_TRUSTSTORE_PASSWORD:kafkalab-ssl-secret}
+      # Disable hostname verification (self-signed cert in dev)
+      ssl.endpoint.identification.algorithm: ""

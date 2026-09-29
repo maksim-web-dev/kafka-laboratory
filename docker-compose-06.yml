@@ -55,7 +55,7 @@ services:
     build: branch06_offsets_commits/order-service
     container_name: order-service-b06
     ports:
-      - "8105:8105"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -66,7 +66,7 @@ services:
     build: branch06_offsets_commits/notification-service
     container_name: notification-service-b06
     ports:
-      - "8106:8106"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - INSTANCE_ID=notification-service-1

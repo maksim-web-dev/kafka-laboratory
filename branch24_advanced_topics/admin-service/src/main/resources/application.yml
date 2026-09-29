@@ -1,0 +1,8 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: admin-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

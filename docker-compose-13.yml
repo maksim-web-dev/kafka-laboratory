@@ -32,7 +32,7 @@ services:
     image: confluentinc/cp-schema-registry:8.0.1
     container_name: schema-registry-b13
     ports:
-      - "8081:8081"
+      - "8090:8081"
     environment:
       - SCHEMA_REGISTRY_HOST_NAME=schema-registry-b13
       - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka:9092
@@ -91,7 +91,7 @@ services:
     build: branch13_saga_pattern/order-service
     container_name: order-service-b13
     ports:
-      - "8136:8136"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b13:8081
@@ -103,7 +103,7 @@ services:
     build: branch13_saga_pattern/payment-service
     container_name: payment-service-b13
     ports:
-      - "8137:8137"
+      - "8083:8083"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b13:8081
@@ -115,7 +115,7 @@ services:
     build: branch13_saga_pattern/inventory-service
     container_name: inventory-service-b13
     ports:
-      - "8138:8138"
+      - "8085:8085"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b13:8081
@@ -127,7 +127,7 @@ services:
     build: branch13_saga_pattern/notification-service
     container_name: notification-service-b13
     ports:
-      - "8139:8139"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b13:8081

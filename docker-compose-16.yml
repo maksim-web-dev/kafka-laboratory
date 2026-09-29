@@ -134,7 +134,7 @@ services:
     build: branch16_cluster_replication/order-service
     container_name: order-service-b16
     ports:
-      - "8169:8169"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092,kafka-3:9092
     depends_on:
@@ -149,7 +149,7 @@ services:
     build: branch16_cluster_replication/notification-service
     container_name: notification-service-b16
     ports:
-      - "8170:8170"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092,kafka-3:9092
     depends_on:

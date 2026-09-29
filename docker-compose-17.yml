@@ -109,7 +109,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana-b17
     ports:
-      - "3017:3000"
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -125,7 +125,7 @@ services:
     build: branch17_observability/order-service
     container_name: order-service-b17
     ports:
-      - "8184:8184"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -136,7 +136,7 @@ services:
     build: branch17_observability/notification-service
     container_name: notification-service-b17
     ports:
-      - "8185:8185"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:

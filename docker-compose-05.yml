@@ -53,7 +53,7 @@ services:
     build: branch05_multiple_consumer_groups/order-service
     container_name: order-service-b05
     ports:
-      - "8101:8101"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -64,7 +64,7 @@ services:
     build: branch05_multiple_consumer_groups/notification-service
     container_name: notification-service-b05
     ports:
-      - "8102:8102"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - INSTANCE_ID=notification-service-1
@@ -76,7 +76,7 @@ services:
     build: branch05_multiple_consumer_groups/analytics-service
     container_name: analytics-service-b05
     ports:
-      - "8103:8103"
+      - "8084:8084"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:

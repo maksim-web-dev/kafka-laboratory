@@ -103,7 +103,7 @@ services:
     build: branch18_security/order-service
     container_name: order-service-b18
     ports:
-      - "8187:8187"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="order-producer" password="order-secret";
@@ -115,7 +115,7 @@ services:
     build: branch18_security/notification-service
     container_name: notification-service-b18
     ports:
-      - "8188:8188"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - KAFKA_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="notification-consumer" password="notif-secret";

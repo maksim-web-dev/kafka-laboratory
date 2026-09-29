@@ -1,0 +1,107 @@
+name: branch23
+
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: kafka
+    ports:
+      - "9092:9128"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=CONTROLLER://:9093,SASL_SSL://:9092,SASL_SSL_HOST://:9128
+      - KAFKA_ADVERTISED_LISTENERS=SASL_SSL://kafka:9092,SASL_SSL_HOST://localhost:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,SASL_SSL:SASL_SSL,SASL_SSL_HOST:SASL_SSL
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=SASL_SSL
+      - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_SASL_ENABLED_MECHANISMS=PLAIN
+      - KAFKA_SSL_KEYSTORE_FILENAME=certs/kafka.server.keystore.jks
+      - KAFKA_SSL_KEYSTORE_CREDENTIALS=ssl_keystore_password
+      - KAFKA_SSL_KEY_CREDENTIALS=ssl_keystore_password
+      - KAFKA_SSL_TRUSTSTORE_FILENAME=certs/kafka.server.truststore.jks
+      - KAFKA_SSL_TRUSTSTORE_CREDENTIALS=ssl_keystore_password
+      - KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=
+      - KAFKA_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      - KAFKA_SUPER_USERS=User:admin
+      - KAFKA_OPTS=-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - CLUSTER_ID=8P0k7rVxX-iQGwO-f58Dwa
+    volumes:
+      - ./branch23_ssl/kafka/kafka_server_jaas.conf:/etc/kafka/secrets/kafka_server_jaas.conf
+      - ./branch23_ssl/kafka/ssl_keystore_password:/etc/kafka/secrets/ssl_keystore_password
+      - ./branch23_ssl/kafka/certs:/etc/kafka/secrets/certs
+    healthcheck:
+      test: ["CMD", "bash", "-c", "kafka-topics --bootstrap-server localhost:9092 --command-config /etc/kafka/secrets/admin.conf --list 2>/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
+
+  acl-init:
+    image: confluentinc/cp-kafka:8.0.1
+    container_name: acl-init-b23
+    volumes:
+      - ./branch23_ssl/kafka/kafka_server_jaas.conf:/etc/kafka/secrets/kafka_server_jaas.conf
+      - ./branch23_ssl/kafka/admin.conf:/etc/kafka/secrets/admin.conf
+      - ./branch23_ssl/kafka/acl-init.sh:/etc/kafka/secrets/acl-init.sh
+      - ./branch23_ssl/kafka/certs:/etc/kafka/secrets/certs
+    command: bash /etc/kafka/secrets/acl-init.sh
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=branch23-ssl
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+      - KAFKA_CLUSTERS_0_SSL_TRUSTSTORELOCATION=/etc/kafka/secrets/certs/kafka.client.truststore.jks
+      - KAFKA_CLUSTERS_0_SSL_TRUSTSTOREPASSWORD=kafkalab-ssl-secret
+      - KAFKA_CLUSTERS_0_SSL_ENDPOINTIDENTIFICATIONALGORITHM=
+    volumes:
+      - ./branch23_ssl/kafka/certs:/etc/kafka/secrets/certs
+    depends_on:
+      acl-init:
+        condition: service_completed_successfully
+
+  order-service:
+    build: branch23_ssl/order-service
+    container_name: order-service-b23
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    volumes:
+      - ./branch23_ssl/kafka/certs:/etc/kafka/secrets/certs
+    depends_on:
+      acl-init:
+        condition: service_completed_successfully
+
+  notification-service:
+    build: branch23_ssl/notification-service
+    container_name: notification-service-b23
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    volumes:
+      - ./branch23_ssl/kafka/certs:/etc/kafka/secrets/certs
+    depends_on:
+      acl-init:
+        condition: service_completed_successfully
+
+networks:
+  default:
+    external: true
+    name: kafka-lab

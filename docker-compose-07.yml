@@ -57,7 +57,7 @@ services:
     build: branch07_producer_configuration/order-service
     container_name: order-service-b07
     ports:
-      - "8109:8109"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
@@ -68,7 +68,7 @@ services:
     build: branch07_producer_configuration/notification-service
     container_name: notification-service-b07
     ports:
-      - "8110:8110"
+      - "8082:8082"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - INSTANCE_ID=notification-service-1

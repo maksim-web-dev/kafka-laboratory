@@ -32,7 +32,7 @@ services:
     image: confluentinc/cp-schema-registry:8.0.1
     container_name: schema-registry-b14
     ports:
-      - "8081:8081"
+      - "8090:8081"
     environment:
       - SCHEMA_REGISTRY_HOST_NAME=schema-registry-b14
       - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka:9092
@@ -94,7 +94,7 @@ services:
     build: branch14_streams/order-service
     container_name: order-service-b14
     ports:
-      - "8142:8142"
+      - "8081:8081"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b14:8081
@@ -106,7 +106,7 @@ services:
     build: branch14_streams/analytics-service
     container_name: analytics-service-b14
     ports:
-      - "8143:8143"
+      - "8084:8084"
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SCHEMA_REGISTRY_URL=http://schema-registry-b14:8081
