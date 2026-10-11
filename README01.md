@@ -1,8 +1,8 @@
 # Branch 01 — Basic Kafka in Docker
 
-## Що реалізовано
+## What's implemented
 
-Мінімальна але повноцінна система з двох Spring Boot сервісів, які спілкуються через Apache Kafka.
+A minimal but complete system of two Spring Boot services communicating via Apache Kafka.
 
 ```
 POST /api/orders
@@ -27,38 +27,38 @@ POST /api/orders
                     └─────────────────────┘
 ```
 
-### Сервіси
+### Services
 
-| Сервіс | Порт | Роль |
-|--------|------|------|
-| `kafka` | 9092 | Брокер у KRaft-режимі (без Zookeeper) |
-| `kafka-ui` | 8080 | Веб-інтерфейс для перегляду топіків і повідомлень |
-| `order-service` | 8081 | Producer: приймає HTTP-запит, публікує `OrderCreatedEvent` |
-| `notification-service` | 8082 | Consumer: читає `OrderCreatedEvent`, імітує відправку email |
+| Service | Port | Role |
+|---------|------|------|
+| `kafka` | 9092 | Broker in KRaft mode (no Zookeeper) |
+| `kafka-ui` | 8080 | Web UI for browsing topics and messages |
+| `order-service` | 8081 | Producer: accepts HTTP request, publishes `OrderCreatedEvent` |
+| `notification-service` | 8082 | Consumer: reads `OrderCreatedEvent`, simulates sending an email |
 
 ---
 
-## Як запустити
+## How to run
 
 ```bash
 docker compose -f docker-compose-01.yml up --build
 ```
 
-Перший запуск завантажує образи та компілює сервіси (5–7 хвилин).
-Наступні запуски — швидкі.
+The first run downloads images and compiles services (5–7 minutes).
+Subsequent runs are fast.
 
-Перевірити готовність:
-Необхідно подивитись у docker-compose або виконати команду
+Check readiness:
+Look at docker-compose or run the command
 ```bash
 docker compose -f docker-compose-01.yml ps
-# всі 4 сервіси мають бути у стані "healthy" або "running"
+# all 4 services should be in "healthy" or "running" state
 ```
 
 ---
 
-## Як протестувати
+## How to test
 
-### 1. Створити замовлення
+### 1. Create an order
 
 ```bash
 curl -s -X POST http://localhost:8081/api/orders \
@@ -70,14 +70,14 @@ curl -s -X POST http://localhost:8081/api/orders \
     "totalAmount": 59.99
   }' | jq
 ```
-або у Windows OS
+or on Windows
 ```cmd
 curl -s -X POST http://localhost:8081/api/orders ^
   -H "Content-Type: application/json" ^
   -d "{\"userId\": \"user-42\", \"product\": \"Kafka: The Definitive Guide\", \"quantity\": 2, \"totalAmount\": 59.99}"
 ```
 
-Відповідь:
+Response:
 ```json
 {
   "orderId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
@@ -89,13 +89,13 @@ curl -s -X POST http://localhost:8081/api/orders ^
 }
 ```
 
-### 2. Перевірити логи notification-service
+### 2. Check notification-service logs
 
 ```bash
 docker logs b01-notification-service --tail=20
 ```
 
-Очікуваний вивід:
+Expected output:
 ```
 ──────────────────────────────────────
  NOTIFICATION #1
@@ -109,80 +109,80 @@ docker logs b01-notification-service --tail=20
 ──────────────────────────────────────
 ```
 
-### 3. Перевірити лічильник отриманих повідомлень
+### 3. Check the received message counter
 
 ```bash
 curl http://localhost:8082/api/notifications/count
 # {"received": 1}
 ```
 
-### 4. Переглянути повідомлення у Kafka UI
+### 4. Browse messages in Kafka UI
 
-Відкрити у браузері: [http://localhost:8080](http://localhost:8080)
+Open in browser: [http://localhost:8080](http://localhost:8080)
 
-- Topics → `01.orders.created` → Messages — видно JSON кожного повідомлення
-- Consumers → `notification-service-group` — видно offset і lag
+- Topics → `01.orders.created` → Messages — shows JSON of each message
+- Consumers → `notification-service-group` — shows offset and lag
 
 ---
 
-## Як це працює всередині
+## How it works internally
 
 ### Producer (order-service)
 
-1. `OrderController` отримує POST-запит і передає дані в `OrderService`.
-2. `OrderService` створює `OrderCreatedEvent` з унікальним `orderId` (UUID) та поточним timestamp.
-3. `KafkaTemplate.send(topic, key, value)` серіалізує event у JSON і надсилає в топік `01.orders.created`.
-   - **Key**: `orderId` — поки що не впливає на routing (1 партиція), але готує нас до branch03.
-   - **Value**: JSON без type headers (`spring.json.add.type.headers=false`).
-4. `CompletableFuture` callback логує partition і offset після підтвердження від брокера.
+1. `OrderController` receives the POST request and passes data to `OrderService`.
+2. `OrderService` creates an `OrderCreatedEvent` with a unique `orderId` (UUID) and current timestamp.
+3. `KafkaTemplate.send(topic, key, value)` serializes the event to JSON and sends it to the `01.orders.created` topic.
+   - **Key**: `orderId` — has no effect on routing yet (1 partition), but prepares us for branch03.
+   - **Value**: JSON without type headers (`spring.json.add.type.headers=false`).
+4. A `CompletableFuture` callback logs the partition and offset after broker acknowledgement.
 
-### Kafka (брокер)
+### Kafka (broker)
 
-- Працює в **KRaft mode**: замість Zookeeper використовує власний Raft-консенсус (`PROCESS_ROLES=broker,controller`).
-- Топік `01.orders.created` створюється автоматично через Spring `NewTopic` bean при старті order-service.
-- 1 партиція, replication factor 1 (single-broker setup для dev).
+- Runs in **KRaft mode**: uses its own Raft consensus instead of Zookeeper (`PROCESS_ROLES=broker,controller`).
+- The `01.orders.created` topic is created automatically via a Spring `NewTopic` bean on order-service startup.
+- 1 partition, replication factor 1 (single-broker dev setup).
 
 ### Consumer (notification-service)
 
-1. `@KafkaListener(topics = ["01.orders.created"], groupId = "notification-service-group")` підписується на топік при старті.
-2. `auto-offset-reset: earliest` — якщо consumer group нова або offset не знайдено, читає з початку.
-3. Метод отримує `ConsumerRecord<String, OrderCreatedEvent>` — включає metadata (partition, offset) і сам event.
-4. `JsonDeserializer` з `spring.json.value.default.type` десеріалізує JSON у локальний `OrderCreatedEvent` клас.
+1. `@KafkaListener(topics = ["01.orders.created"], groupId = "notification-service-group")` subscribes to the topic on startup.
+2. `auto-offset-reset: earliest` — if the consumer group is new or offset is not found, reads from the beginning.
+3. The method receives `ConsumerRecord<String, OrderCreatedEvent>` — includes metadata (partition, offset) and the event itself.
+4. `JsonDeserializer` with `spring.json.value.default.type` deserializes the JSON into the local `OrderCreatedEvent` class.
 
-### Чому два різних класи OrderCreatedEvent?
+### Why two separate OrderCreatedEvent classes?
 
-У `order-service` і `notification-service` є однойменний клас, але в різних пакетах.
-Це свідомо: в реальній системі сервіси — незалежні застосунки, які не повинні ділити код через shared library (поки що).
-Починаючи з branch11 (Avro + Schema Registry) ми вирішуємо цю проблему через контракти схем.
-
----
-
-## Чому KRaft а не Zookeeper?
-
-Apache Kafka 3.3+ підтримує **KRaft** (Kafka Raft) — вбудований механізм консенсусу.
-З Kafka 4.0 Zookeeper повністю видалено. KRaft:
-- Простіший деплой (один process замість двох)
-- Швидший старт і shutdown
-- Більш масштабований для великих кластерів
+Both `order-service` and `notification-service` have a class with the same name but in different packages.
+This is intentional: in a real system, services are independent applications that should not share code via a shared library (for now).
+Starting from branch11 (Avro + Schema Registry) we solve this problem through schema contracts.
 
 ---
 
-## Ключові концепції цієї гілки
+## Why KRaft instead of Zookeeper?
 
-| Концепція | Що демонструє приклад |
-|-----------|----------------------|
-| **Topic** | `01.orders.created` — канал для подій одного типу |
-| **Producer** | `KafkaTemplate.send()` — публікація повідомлення |
-| **Consumer** | `@KafkaListener` — підписка на топік |
-| **Consumer Group** | `notification-service-group` — логічна група читачів |
-| **Message Key** | `orderId` як ключ повідомлення |
-| **Offset** | Порядковий номер повідомлення в партиції |
-| **KRaft mode** | Kafka без Zookeeper |
-| **JsonSerializer** | Серіалізація Kotlin data class у JSON |
+Apache Kafka 3.3+ supports **KRaft** (Kafka Raft) — a built-in consensus mechanism.
+From Kafka 4.0, Zookeeper has been completely removed. KRaft offers:
+- Simpler deployment (one process instead of two)
+- Faster startup and shutdown
+- Better scalability for large clusters
 
 ---
 
-## Структура проєкту
+## Key concepts in this branch
+
+| Concept | What the example demonstrates |
+|---------|-------------------------------|
+| **Topic** | `01.orders.created` — a channel for one type of event |
+| **Producer** | `KafkaTemplate.send()` — publishing a message |
+| **Consumer** | `@KafkaListener` — subscribing to a topic |
+| **Consumer Group** | `notification-service-group` — a logical group of readers |
+| **Message Key** | `orderId` as the message key |
+| **Offset** | Sequential number of a message within a partition |
+| **KRaft mode** | Kafka without Zookeeper |
+| **JsonSerializer** | Serializing a Kotlin data class to JSON |
+
+---
+
+## Project structure
 
 ```
 kafka-laboratory/
@@ -195,7 +195,7 @@ kafka-laboratory/
     │   ├── settings.gradle.kts
     │   └── src/main/kotlin/com/kafkalab/order/
     │       ├── OrderServiceApplication.kt
-    │       ├── config/KafkaTopicConfig.kt      ← створення топіку
+    │       ├── config/KafkaTopicConfig.kt      ← topic creation
     │       ├── controller/OrderController.kt   ← POST /api/orders
     │       ├── model/
     │       │   ├── CreateOrderRequest.kt
@@ -214,10 +214,10 @@ kafka-laboratory/
 
 ---
 
-## Що далі — branch02
+## What's next — branch02
 
-У наступній гілці вивчаємо топіки детальніше:
-- Декілька топіків для різних типів подій
+In the next branch we explore topics in more detail:
+- Multiple topics for different event types
 - Naming conventions
-- Налаштування партицій і retention через CLI
-- `kafka-topics.sh` команди
+- Partition and retention configuration via CLI
+- `kafka-topics.sh` commands
