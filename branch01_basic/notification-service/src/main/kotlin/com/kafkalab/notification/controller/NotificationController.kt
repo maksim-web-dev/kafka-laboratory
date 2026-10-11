@@ -10,5 +10,9 @@ import org.springframework.web.bind.annotation.RestController
 class NotificationController(private val listener: OrderEventListener) {
 
     @GetMapping("/count")
-    fun count(): Map<String, Int> = mapOf("received" to listener.getReceivedCount())
+    fun count(): Map<String, Int> = mapOf(
+        "orders_created"   to listener.getCreatedCount(),
+        "orders_cancelled" to listener.getCancelledCount(),
+        "total"            to (listener.getCreatedCount() + listener.getCancelledCount())
+    )
 }
